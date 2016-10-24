@@ -1,0 +1,12 @@
+#!/usr/bin/env ruby
+
+def banner heading
+  puts " #{heading} ".center `tput cols`.to_i, '-'
+end
+
+banner '$LOAD_PATH'
+puts $LOAD_PATH
+banner '$PATH'
+puts ENV['PATH']
+  .split(':')
+  .select { |e| e =~ /gem|rub/ }
