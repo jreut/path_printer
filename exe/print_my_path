@@ -1,12 +1,40 @@
 #!/usr/bin/env ruby
 
-def banner heading
-  puts " #{heading} ".center `tput cols`.to_i, '-'
+bold = false
+
+if ARGV[0] == '--bold'
+  ARGV.shift
+  bold = true
 end
 
-banner '$LOAD_PATH'
-puts $LOAD_PATH
-banner '$PATH'
-puts ENV['PATH']
+class Collector
+  attr_reader :lines
+
+  def initialize(bold: false)
+    @lines = []
+  end
+
+  def banner heading
+    @lines << " #{heading} ".center(`tput cols`.to_i, '-')
+  end
+
+  def say string
+    @lines += [*string]
+  end
+end
+
+c = Collector.new
+
+c.banner '$LOAD_PATH'
+c.say $LOAD_PATH
+c.banner '$PATH'
+c.say ENV['PATH']
   .split(':')
   .select { |e| e =~ /gem|rub/ }
+
+if bold
+  require 'embolden'
+  system 'bundle', 'exec', 'embolden', c.lines.join("\n")
+else
+  puts c.lines
+end
